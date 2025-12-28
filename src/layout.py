@@ -4,7 +4,8 @@ from flet import (
     Row,
     MainAxisAlignment,
     CrossAxisAlignment,
-    Container
+    Container,
+    Colors
 )
 
 #コンテンツ読み込み
@@ -22,14 +23,28 @@ class MyLayout(Row):
     def __init__(self, page: Page):
         super().__init__()
         self.alignment=MainAxisAlignment.START
-        self.vertical_alignment=CrossAxisAlignment.START
+        self.vertical_alignment=CrossAxisAlignment.STRETCH
+        self.expand = True
+        self.spacing = 0
 
         #GoogleDrivePresenter
         systemLogic = GoogleDrivePresenter()
 
+        #コンテンツの最小サイズ設定
+        page.window.min_width = systemLogic.SIDEBAR_MIN_WIDTH + systemLogic.BODY_MIN_WIDTH
+        page.window.min_height = systemLogic.CONTENT_MIN_HEIGHT
+
+        #基本レイアウト作成
+        self.sidebar_container = SidebarView1()
+        self.body_container = BodyView1()
+
+        self.controls = [
+            self.sidebar_container,
+            self.body_container
+        ]
+
         if not systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH):
             print("dataset.csvが見つかりません")
-
 
         # print(systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH))
         # print(systemLogic.hasErrorFiles(systemLogic.ERROR_FOLDER_PATH))
@@ -40,15 +55,4 @@ class MyLayout(Row):
         else:
             print("view1に移行したよん")
 
-        #
-        # page.add(Header())
-
-
-    def changeView(self, view: str):
-        if (view == "view1"):
-            print("view1")
-        elif (view == "view2"):
-            print("view2")
-        else:
-            print("error")
 

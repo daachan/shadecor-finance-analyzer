@@ -7,7 +7,7 @@ from flet import (
 
 def main(page: Page):
     page.title = "活動費明細書ジェネレータ"
-    page.padding = 10
+    page.padding = 0
 
     page.add(MyLayout(page))
 

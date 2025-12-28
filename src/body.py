@@ -1,11 +1,15 @@
+from drivePresenter import GoogleDrivePresenter
 from flet import (
-    Row,
-    MainAxisAlignment,
-    CrossAxisAlignment
+    Container,
+    Colors
 )
 
-class Body(Row):
+class Body(Container):
     def __init__(self):
         super().__init__()
-        self.alignment=MainAxisAlignment.START
-        self.vertical_alignment=CrossAxisAlignment.START
+        self.bgcolor = Colors.ORANGE_100
+        self.padding = 10
+
+        self.systemLogic = GoogleDrivePresenter()
+        self.width = self.systemLogic.BODY_MIN_WIDTH
+        self.expand = True

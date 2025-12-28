@@ -9,6 +9,9 @@ class GoogleDrivePresenter():
 
         self.SCRIPT_FOLDER_PATH = os.environ.get("SCRIPT_FOLDER_PATH")
         self.ERROR_FOLDER_PATH = os.environ.get("ERROR_FOLDER_PATH")
+        self.SIDEBAR_MIN_WIDTH = int(os.environ.get("SIDEBAR_MIN_WIDTH", 300))
+        self.BODY_MIN_WIDTH = int(os.environ.get("BODY_MIN_WIDTH", 500))
+        self.CONTENT_MIN_HEIGHT = int(os.environ.get("CONTENT_MIN_HEIGHT", 600))
     
     # マスタDBが存在しているか確認する
     def isDatasetExists(self, folder_path):

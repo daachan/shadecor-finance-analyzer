@@ -1,11 +1,15 @@
+from drivePresenter import GoogleDrivePresenter
 from flet import (
-    Column,
-    MainAxisAlignment,
-    CrossAxisAlignment
+    Container,
+    Colors
 )
 
-class Sidebar(Column):
+class Sidebar(Container):
     def __init__(self):
         super().__init__()
-        self.alignment=MainAxisAlignment.START
-        self.vertical_alignment=CrossAxisAlignment.START
+        self.bgcolor = Colors.YELLOW
+        self.padding = 10
+
+        self.systemLogic = GoogleDrivePresenter()
+        self.width = self.systemLogic.SIDEBAR_MIN_WIDTH
+        self.expand = False
