@@ -1,4 +1,5 @@
 #必要ライブラリ読み込み
+import sys
 from flet import (
     Page,
     Row,
@@ -35,8 +36,8 @@ class MyLayout(Row):
         page.window.min_height = systemLogic.CONTENT_MIN_HEIGHT
 
         #基本レイアウト作成
-        self.sidebar_container = SidebarView1()
-        self.body_container = BodyView1()
+        self.sidebar_container = SidebarView2(func=self.changeView)
+        self.body_container = BodyView2()
 
         self.controls = [
             self.sidebar_container,
@@ -45,6 +46,7 @@ class MyLayout(Row):
 
         if not systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH):
             print("dataset.csvが見つかりません")
+            sys.exit()
 
         # print(systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH))
         # print(systemLogic.hasErrorFiles(systemLogic.ERROR_FOLDER_PATH))
@@ -54,5 +56,23 @@ class MyLayout(Row):
             print("view2に移行したよん")
         else:
             print("view1に移行したよん")
+    
+    def changeView(self, view_name: str):
+        # 2. 指定された view_name に応じてインスタンスを生成
+        if view_name == "view1":
+            self.sidebar_container = SidebarView1(func=self.changeView)
+            self.body_container = BodyView1()
+        elif view_name == "view2":
+            self.sidebar_container = SidebarView2(func=self.changeView)
+            self.body_container = BodyView2()
+        
+        # 3. Row(self) の中身をまるごと差し替える
+        self.controls = [
+            self.sidebar_container,
+            self.body_container
+        ]
+        
+        # 4. 画面を更新
+        self.update()
 
 

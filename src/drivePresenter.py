@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import pandas as pd
 
 class GoogleDrivePresenter():
     def __init__(self):
@@ -33,3 +34,10 @@ class GoogleDrivePresenter():
                 return True
 
         return False
+
+    def getDataset(self, folder_path):
+        masterdb_path = os.path.join(folder_path, "dataset.csv")
+        sheet = pd.read_csv(masterdb_path)
+        return sheet
+
+    
