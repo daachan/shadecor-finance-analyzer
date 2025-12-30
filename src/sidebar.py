@@ -7,7 +7,7 @@ from flet import (
 class Sidebar(Container):
     def __init__(self):
         super().__init__()
-        self.bgcolor = Colors.YELLOW
+        self.bgcolor = Colors.BLUE_50
         self.padding = 10
 
         self.systemLogic = GoogleDrivePresenter()

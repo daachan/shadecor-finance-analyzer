@@ -35,8 +35,8 @@ class GoogleDrivePresenter():
 
         return False
 
-    def getDataset(self, folder_path):
-        masterdb_path = os.path.join(folder_path, "dataset.csv")
+    def getDataset(self):
+        masterdb_path = os.path.join(str(self.SCRIPT_FOLDER_PATH), "dataset.csv")
         sheet = pd.read_csv(masterdb_path)
         return sheet
 

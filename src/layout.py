@@ -36,8 +36,8 @@ class MyLayout(Row):
         page.window.min_height = systemLogic.CONTENT_MIN_HEIGHT
 
         #基本レイアウト作成
-        self.sidebar_container = SidebarView2(func=self.changeView)
-        self.body_container = BodyView2()
+        self.sidebar_container = SidebarView2(func=self.switchContentByName)
+        self.body_container = BodyView1()
 
         self.controls = [
             self.sidebar_container,
@@ -57,22 +57,16 @@ class MyLayout(Row):
         else:
             print("view1に移行したよん")
     
-    def changeView(self, view_name: str):
-        # 2. 指定された view_name に応じてインスタンスを生成
-        if view_name == "view1":
-            self.sidebar_container = SidebarView1(func=self.changeView)
-            self.body_container = BodyView1()
-        elif view_name == "view2":
-            self.sidebar_container = SidebarView2(func=self.changeView)
-            self.body_container = BodyView2()
+    #名前に応じたコンテンツを生成(view2 bodyの切り替え)
+    def switchContentByName(self, pick_name: str):
+
+        self.body_container = BodyView2(pick_name)
         
-        # 3. Row(self) の中身をまるごと差し替える
         self.controls = [
             self.sidebar_container,
             self.body_container
         ]
         
-        # 4. 画面を更新
         self.update()
 
 
