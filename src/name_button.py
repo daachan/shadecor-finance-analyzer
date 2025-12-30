@@ -1,16 +1,23 @@
 from flet import (
     Container,
     Text,
+    TextOverflow,
     Colors,
     padding,
     Alignment,
-    MouseCursor
+    MouseCursor,
 )
 
 class NameButton(Container):
     def __init__(self, name, func_switch):
         super().__init__()
-        self.content = Text(name, size=16, color=Colors.BLACK)
+        self.content = Text(
+            name, 
+            size=16, 
+            color=Colors.BLACK,
+            max_lines=1,              
+            overflow=TextOverflow.ELLIPSIS   
+        )
         self.padding = padding.all(10)
         self.alignment = Alignment(-1.0, 0) 
         self.ink = True  

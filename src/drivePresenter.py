@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 import pandas as pd
+import glob
 
 class GoogleDrivePresenter():
     def __init__(self):
@@ -19,8 +20,14 @@ class GoogleDrivePresenter():
         if not folder_path:
             return False
         
-        masterdb_path = os.path.join(folder_path, "dataset.csv")
-        return os.path.exists(masterdb_path)
+        search = os.path.join(folder_path, "dataset*.csv")
+        search_results = glob.glob(search)
+
+        if not search_results:
+            return False
+
+        latest_masterdb_path = max(search_results, key=os.path.getmtime)
+        return os.path.exists(latest_masterdb_path)
     
     # 指定フォルダに.xlsxファイルが存在するか確認する
     def hasErrorFiles(self, folder_path, extension=".xlsx"):
@@ -36,8 +43,12 @@ class GoogleDrivePresenter():
         return False
 
     def getDataset(self):
-        masterdb_path = os.path.join(str(self.SCRIPT_FOLDER_PATH), "dataset.csv")
-        sheet = pd.read_csv(masterdb_path)
+        search = os.path.join(str(self.SCRIPT_FOLDER_PATH), "dataset*.csv")
+        search_results = glob.glob(search)
+
+        lataset_masterdb_path = max(search_results, key=os.path.getmtime)
+
+        sheet = pd.read_csv(lataset_masterdb_path)
         return sheet
 
     
