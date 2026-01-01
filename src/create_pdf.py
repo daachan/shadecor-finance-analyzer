@@ -189,74 +189,7 @@ class PDFGenerator():
         column_table.wrapOn(pdf_canvas, 15 * mm, 10 * mm)
         column_table.drawOn(pdf_canvas, 15 * mm, 10 * mm)
 
-
-
-
-        # # --- 社名部分（Table） ---
-        # company_data = [
-        #     ["ほげほげ会社御中", ""],
-        #     ["案件名", "ほげほげ案件"],
-        #     ["御見積有効限：発行日より30日", ""],
-        # ]
-        # table = Table(company_data, colWidths=(40 * mm, 80 * mm), rowHeights=(7 * mm))
-        # table.setStyle(TableStyle([
-        #     ("FONT", (0, 0), (-1, -1), font_bold, 12),
-        #     ("LINEBELOW", (0, 0), (0, 1), 1, colors.black), # 下線
-        #     ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        # ]))
-        # table.wrapOn(pdf_canvas, 20 * mm, 240 * mm)
-        # table.drawOn(pdf_canvas, 20 * mm, 240 * mm)
-
-        # pdf_canvas.drawString(20 * mm, 230 * mm, "下記の通り御見積申し上げます")
-
-        # # --- 合計金額 ---
-        # total_data = [["合計金額（消費税込）", "1,100 円"]]
-        # total_table = Table(total_data, colWidths=(50 * mm, 40 * mm), rowHeights=(10 * mm))
-        # total_table.setStyle(TableStyle([
-        #     ("FONT", (0, 0), (-1, -1), font_bold, 12),
-        #     ("BOX", (0, 0), (-1, -1), 1, colors.black),
-        #     ("INNERGRID", (0, 0), (-1, -1), 1, colors.black),
-        #     ("ALIGN", (1, 0), (1, 0), "RIGHT"),
-        #     ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        # ]))
-        # total_table.wrapOn(pdf_canvas, 20 * mm, 210 * mm)
-        # total_table.drawOn(pdf_canvas, 20 * mm, 210 * mm)
-
-        # # --- 品目明細 ---
-        # items_data = [["内容", "開始月", "終了月", "単価", "数量", "金額"]]
-        # for _ in range(10):  # 空行
-        #     items_data.append([" ", " ", " ", " ", " ", " "])
-        
-        # items_data.append(["", "", "", "合計", "", "1,000"])
-        # items_data.append(["", "", "", "消費税", "", "100"])
-        # items_data.append(["", "", "", "税込合計", "", "1,100"])
-
-        # item_table = Table(items_data, colWidths=(60 * mm, 25 * mm, 25 * mm, 20 * mm, 20 * mm, 25 * mm), rowHeights=7 * mm)
-        # item_table.setStyle(TableStyle([
-        #     ("FONT", (0, 0), (-1, -1), font_bold, 9),
-        #     ("BOX", (0, 0), (-1, 10), 1, colors.black),
-        #     ("INNERGRID", (0, 0), (-1, 10), 1, colors.black),
-        #     ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        #     ("ALIGN", (3, 0), (-1, -1), "RIGHT"),
-        # ]))
-        # item_table.wrapOn(pdf_canvas, 17 * mm, 120 * mm)
-        # item_table.drawOn(pdf_canvas, 17 * mm, 120 * mm)
-
-        # # --- 備考欄 ---
-        # pdf_canvas.drawString(17 * mm, 110 * mm, "<備考>")
-        # memo_table = Table([[""]], colWidths=(180 * mm), rowHeights=50 * mm)
-        # memo_table.setStyle(TableStyle([
-        #     ("BOX", (0, 0), (-1, -1), 1, colors.black),
-        # ]))
-        # memo_table.wrapOn(pdf_canvas, 17 * mm, 55 * mm)
-        # memo_table.drawOn(pdf_canvas, 17 * mm, 55 * mm)
-
         # 保存
         pdf_canvas.showPage()
         pdf_canvas.save()
         print(f"PDF作成完了: {os.path.abspath(self.filepath)}")
-
-# 実行テスト
-if __name__ == "__main__":
-    gen = PDFGenerator("関学太郎")
-    gen.create_pdf()

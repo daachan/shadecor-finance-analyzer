@@ -1,5 +1,5 @@
-from name_button import NameButton
 from sidebar_view2 import SidebarView2
+from create_pdf import PDFGenerator
 from flet import (
     AppBar,
     MainAxisAlignment,
@@ -8,8 +8,6 @@ from flet import (
     Icons,
     Colors,
     Page,
-    Text,
-    AlertDialog
 )
 
 class Header(AppBar):
@@ -35,6 +33,10 @@ class Header(AppBar):
         for item in self.sidebar.btn_list:
             if item.checkFrag:
                 selected_namelist.append(item.name)
+        
+        for name in selected_namelist:
+            pdf = PDFGenerator(name)
+            pdf.create_pdf()
 
 
         
