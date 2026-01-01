@@ -7,7 +7,7 @@ from flet import (
 class Body(Container):
     def __init__(self):
         super().__init__()
-        self.bgcolor = Colors.GREY_50
+        self.bgcolor = Colors.WHITE_10
         self.padding = 10
 
         self.systemLogic = GoogleDrivePresenter()

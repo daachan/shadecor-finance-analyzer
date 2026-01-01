@@ -39,6 +39,7 @@ class MyLayout(Row):
         self.sidebar_container = SidebarView2(func=self.switchContentByName)
         self.body_container = BodyView1()
 
+        page.appbar = Header(page, self.sidebar_container)
         self.controls = [
             self.sidebar_container,
             self.body_container
@@ -48,9 +49,6 @@ class MyLayout(Row):
             print("dataset.csvが見つかりません")
             sys.exit()
 
-        # print(systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH))
-        # print(systemLogic.hasErrorFiles(systemLogic.ERROR_FOLDER_PATH))
-
         #初期状態の確認
         if (systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH)) and (not systemLogic.hasErrorFiles(systemLogic.ERROR_FOLDER_PATH)):
             print("view2に移行したよん")
@@ -59,14 +57,11 @@ class MyLayout(Row):
     
     #名前に応じたコンテンツを生成(view2 bodyの切り替え)
     def switchContentByName(self, pick_name: str):
-
         self.body_container = BodyView2(pick_name)
-        
         self.controls = [
             self.sidebar_container,
             self.body_container
         ]
-        
         self.update()
 
 
