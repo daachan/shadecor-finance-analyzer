@@ -1,4 +1,3 @@
-from create_pdf import ReportlabView
 from name_button import NameButton
 from sidebar_view2 import SidebarView2
 from flet import (
@@ -37,6 +36,5 @@ class Header(AppBar):
             if item.checkFrag:
                 selected_namelist.append(item.name)
 
-        a = ReportlabView()
 
         

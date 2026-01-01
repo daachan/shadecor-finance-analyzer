@@ -1,4 +1,6 @@
 import os
+import pandas as pd
+from datetime import datetime
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
@@ -7,9 +9,50 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib.units import mm
 from reportlab.lib import colors
 
+from drivePresenter import GoogleDrivePresenter
+
 class PDFGenerator():
-    def __init__(self, filename="output.pdf"):
-        self.filename = filename
+    def __init__(self, filename="no_arg_output"):
+        now = datetime.now()
+        self.date = now.strftime("%Y-%m-%d")
+
+        self.username = filename
+        self.filepath = "/Users/daiki/Desktop/shadecor-finance-analyzer/pdf_folder/" + filename + "_" + self.date + ".pdf"
+        
+        self.systemLogic = GoogleDrivePresenter()
+        db = self.systemLogic.getDataset()
+        user_data = db[db["名前"] == self.username]
+
+        # NaNであるかを判定して文字列を返す
+        def get_val(col_name, is_int=True):
+            val = user_data.iloc[0][col_name]
+            if pd.isna(val):
+                if is_int:
+                    return "0"
+                else:
+                    return "NaN"
+
+            if is_int:
+                return str(int(val))
+            else:
+                return str(val)
+
+        print(user_data)
+        
+        self.student_id = get_val("学籍番号", is_int=True)
+        self.role = get_val("職位", is_int=False)
+        self.attend_num = get_val("出席（オンライン含む）", is_int=True)
+        self.absent_num = get_val("欠席", is_int=True)
+        self.trip_num = get_val("出張", is_int=True)
+        self.late_num = get_val("遅刻", is_int=True)
+        self.onsite_num = get_val("現場回数", is_int=True)
+        self.top_duty_num = get_val("Top Duty回数", is_int=True)
+        self.unit_lead_num = get_val("Unit Lead回数", is_int=True)
+        self.creative_num = get_val("Creative回数", is_int=True)
+        self.help_num = get_val("Help回数", is_int=True)
+        
+
+
 
     def create_pdf(self, data_list=None):
         # 日本語フォントの設定
@@ -18,13 +61,13 @@ class PDFGenerator():
 
         # 保存先を指定してキャンバスを作成
         # 原点は左下
-        pdf_canvas = canvas.Canvas(self.filename, pagesize=portrait(A4))
+        pdf_canvas = canvas.Canvas(self.filepath, pagesize=portrait(A4))
         A4_HEIGHT = 297 * mm
         A4_WIDTH = 210 * mm
         
         # 日付
         pdf_canvas.setFont(font_bold, 10)
-        pdf_canvas.drawRightString(A4_WIDTH - 15 * mm, A4_HEIGHT - 15 * mm, "発行日：yyyy-MM-dd")
+        pdf_canvas.drawRightString(A4_WIDTH - 15 * mm, A4_HEIGHT - 15 * mm, "発行日：" + self.date)
 
         # ヘッダー
         pdf_canvas.setFont(font_bold, 24)
@@ -32,16 +75,16 @@ class PDFGenerator():
 
         # 基本情報
         pdf_canvas.setFont(font_bold, 10)
-        pdf_canvas.drawString(15 * mm, A4_HEIGHT - 45 * mm, "名前：こんにちは")
-        pdf_canvas.drawString(15 * mm, A4_HEIGHT - 52 * mm, "職位：こんにちは")
-        pdf_canvas.drawString(15 * mm, A4_HEIGHT - 59 * mm, "学籍番号：37298753")
+        pdf_canvas.drawString(15 * mm, A4_HEIGHT - 45 * mm, "名前：" + self.username)
+        pdf_canvas.drawString(15 * mm, A4_HEIGHT - 52 * mm, "職位：" + self.role)
+        pdf_canvas.drawString(15 * mm, A4_HEIGHT - 59 * mm, "学籍番号：" + self.student_id)
 
         # 勤怠実績
         attend_data = [
-            ["出席日数(オンライン含む)", "xx"],
-            ["欠席日数", "xx"],
-            ["出張日数", "xx"],
-            ["早退日数", "xx"],
+            ["出席日数(オンライン含む)", self.attend_num],
+            ["欠席日数", self.absent_num],
+            ["出張日数", self.trip_num],
+            ["遅刻日数", self.late_num],
             ["", ""]
         ]
         attend_table = Table(attend_data, colWidths=(60 * mm, 25 * mm), rowHeights=(7 * mm))
@@ -57,11 +100,11 @@ class PDFGenerator():
 
         # 勤怠実績2
         role_data = [
-            ["現場回数", "xx"],
-            ["Top Duty回数", "xx"],
-            ["Unit Lead回数", "xx"],
-            ["Creative回数", "xx"],
-            ["Help回数", "xx"]
+            ["現場回数", self.onsite_num],
+            ["Top Duty回数", self.top_duty_num],
+            ["Unit Lead回数", self.unit_lead_num],
+            ["Creative回数", self.creative_num],
+            ["Help回数", self.help_num]
         ]
         role_table = Table(role_data, colWidths=(60 * mm, 25 * mm), rowHeights=(7 * mm))
         role_table.setStyle(TableStyle([
@@ -137,7 +180,7 @@ class PDFGenerator():
         ]
         column_table = Table(column_name, colWidths=(18 * mm), rowHeights=(5 * mm, 18 * mm))
         column_table.setStyle(TableStyle([
-            ("FONT", (0, 0), (-1, -1), font_bold, 5),
+            ("FONT", (0, 0), (-1, -1), font_bold, 6),
             ("BOX", (0, 0), (-1, -1), 1, colors.black),
             ("INNERGRID", (0, 0), (-1, -1), 1, colors.black),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
@@ -211,9 +254,9 @@ class PDFGenerator():
         # 保存
         pdf_canvas.showPage()
         pdf_canvas.save()
-        print(f"PDF作成完了: {os.path.abspath(self.filename)}")
+        print(f"PDF作成完了: {os.path.abspath(self.filepath)}")
 
 # 実行テスト
 if __name__ == "__main__":
-    gen = PDFGenerator("/Users/daiki/Desktop/shadecor-finance-analyzer/pdf_folder/test.pdf")
+    gen = PDFGenerator("関学太郎")
     gen.create_pdf()
