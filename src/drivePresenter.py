@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 import pandas as pd
 import glob
@@ -11,6 +12,7 @@ class GoogleDrivePresenter():
 
         self.SCRIPT_FOLDER_PATH = os.environ.get("SCRIPT_FOLDER_PATH")
         self.ERROR_FOLDER_PATH = os.environ.get("ERROR_FOLDER_PATH")
+        self.NAME_FOLDER_PATH = os.environ.get("NAME_FOLDER_PATH")
         self.SIDEBAR_MIN_WIDTH = int(os.environ.get("SIDEBAR_MIN_WIDTH", 300))
         self.BODY_MIN_WIDTH = int(os.environ.get("BODY_MIN_WIDTH", 500))
         self.CONTENT_MIN_HEIGHT = int(os.environ.get("CONTENT_MIN_HEIGHT", 600))
@@ -42,6 +44,7 @@ class GoogleDrivePresenter():
 
         return False
 
+    # Driveに保存されているマスタデータを取得する
     def getDataset(self):
         search = os.path.join(str(self.SCRIPT_FOLDER_PATH), "dataset*.csv")
         search_results = glob.glob(search)
@@ -51,5 +54,37 @@ class GoogleDrivePresenter():
         sheet = pd.read_csv(lataset_masterdb_path)
         return sheet
     
+    # 開始期間 ~ 終了期間までの対象.xlsxファイルを取得する
+    # time : 2025-12-30 → "20251230" 
+    def getXlsx(self, name:str, start_time:str, end_time:str):
+        st = start_time + "_00-00-00"
+        et = end_time + "_23-59-59"
+        start_datetime = datetime.strptime(st, "%Y-%m-%d_%H-%M-%S")
+        end_datetime = datetime.strptime(et, "%Y-%m-%d_%H-%M-%S")
+
+        search = os.path.join(str(self.NAME_FOLDER_PATH), name + "*.xlsx")
+        search_results = glob.glob(search)
+
+        matched_file_path_list = [] 
+
+        for data in search_results:
+            file_name = os.path.basename(data)
+            fn, ex = os.path.splitext(file_name)
+
+            parts = fn.split("_")
+            timestamp_str = f"{parts[1]}_{parts[2]}" # YY-mm-dd_HH-MM-SS
+            timestamp_datetime = datetime.strptime(timestamp_str, "%Y-%m-%d_%H-%M-%S")
+
+            if start_datetime <= timestamp_datetime <= end_datetime:
+                matched_file_path_list.append(data)
+        
+        return matched_file_path_list
+
+
+
+
+
+
+        
 
     
