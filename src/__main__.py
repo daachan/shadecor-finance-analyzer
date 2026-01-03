@@ -2,7 +2,6 @@ from layout import MyLayout
 from flet import (
     app,
     Page,
-    Row
 )
 
 def main(page: Page):

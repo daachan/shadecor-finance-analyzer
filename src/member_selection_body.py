@@ -8,14 +8,19 @@ from flet import (
     Divider,
     VerticalDivider,
     CrossAxisAlignment,
-    MainAxisAlignment,
-    Colors
+    Colors,
+    ScrollMode
 )
 
-class BodyView2(Body):
+class MemberSelectionBody(Body):
     def __init__(self, name: str):
         super().__init__()
         
+        # ファイル名, 期間に合致する交通費・その他経費 のリストを取得
+        file_path_list = self.systemLogic.getXlsx(name, "2025-3-1", "2025-12-31")
+        transport_expense_list, item_expense_list = self.systemLogic.getExpenseData(file_path_list)
+
+        # datasetを取得
         db = self.systemLogic.getDataset()
         member_row = db.loc[db["名前"] == name]
 
@@ -69,5 +74,13 @@ class BodyView2(Body):
                         ],
                     ),
                 ),
+                Container(height=10),
+                Column(
+                    controls=[
+                        Text("▼ 申請書一覧 ▼", size=16),
+                        
+                    ],
+                    scroll=ScrollMode.AUTO
+                )
             ],
         )

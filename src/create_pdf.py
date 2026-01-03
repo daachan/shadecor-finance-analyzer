@@ -50,9 +50,6 @@ class PDFGenerator():
         self.unit_lead_num = get_val("Unit Lead回数", is_int=True)
         self.creative_num = get_val("Creative回数", is_int=True)
         self.help_num = get_val("Help回数", is_int=True)
-        
-
-
 
     def create_pdf(self, data_list=None):
         # 日本語フォントの設定
@@ -134,7 +131,7 @@ class PDFGenerator():
 
         # 支給明細
         payment_data = [["摘要", "金額", "摘要", "金額", "摘要", "金額"]]
-        rows = [["こんにちは", i + 10000, "こんにちは", i, "こんにちは", i] for i in range(0, 20)]
+        rows = [["こんにちは", i + 10000, "(電車)武庫川女子大前-中山寺_2025-11-12", i, "こんにちは", i] for i in range(0, 20)]
         payment_data.extend(rows) # または payment_data += rows
         payment_table = Table(
             payment_data, 
@@ -149,7 +146,7 @@ class PDFGenerator():
             rowHeights=(7 * mm)
         )
         payment_table.setStyle(TableStyle([
-            ("FONT", (0, 0), (-1, -1), font_bold, 8),
+            ("FONT", (0, 0), (-1, -1), font_bold, 5),
             ("BOX", (0, 0), (-1, -1), 1, colors.black),
             ("INNERGRID", (0, 0), (-1, -1), 1, colors.black),
             # ("ALIGN", (0, 0), (-1, -1), "CENTER"),

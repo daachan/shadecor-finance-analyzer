@@ -4,11 +4,12 @@ from flet import (
     Text
 )
 
-class BodyView1(Body):
-    def __init__(self):
+class ErrorPreviewBody(Body):
+    def __init__(self, message:str):
         super().__init__()
         self.alignment = Alignment(0, 0)
-        self.content = Text("view1")
+        self.content = Text("ERROR: " + message)
+        print("ERROR: " + message)
 
     def ahoi(self):
         print("ahoi")

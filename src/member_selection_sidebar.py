@@ -10,7 +10,7 @@ from flet import (
 
 from name_button import NameButton
 
-class SidebarView2(Sidebar):
+class MemberSelectionSidebar(Sidebar):
     def __init__(self, func):
         super().__init__()
         
