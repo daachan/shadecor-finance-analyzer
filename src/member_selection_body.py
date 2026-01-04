@@ -1,4 +1,5 @@
 import pandas as pd
+from expense_summary_card import ExpenseSummaryCard
 from body import Body
 from flet import (
     Column,
@@ -12,17 +13,29 @@ from flet import (
     ScrollMode
 )
 
+
 class MemberSelectionBody(Body):
     def __init__(self, name: str):
         super().__init__()
+        self.name = name
         
-        # ファイル名, 期間に合致する交通費・その他経費 のリストを取得
+        # ファイル名, 期間に合致する交通費・交通費意外の経費 のリストを取得
         file_path_list = self.systemLogic.getXlsx(name, "2025-3-1", "2025-12-31")
         transport_expense_list, item_expense_list = self.systemLogic.getExpenseData(file_path_list)
 
-        # datasetを取得
+        # 交通費明細ボタン
+        self.transport_expense_summary_list: list[ExpenseSummaryCard] = []
+        for item in transport_expense_list:
+            self.transport_expense_summary_list.append(ExpenseSummaryCard(item[0], item[1], item[2]))
+
+        # 交通費以外の経費明細ボタン
+        self.item_expense_summary_list: list[ExpenseSummaryCard] = []
+        for item in item_expense_list:
+            self.item_expense_summary_list.append(ExpenseSummaryCard(item[0], item[1], item[2]))
+
+        # マスタDBから勤怠実績などのリストを取得
         db = self.systemLogic.getDataset()
-        member_row = db.loc[db["名前"] == name]
+        member_row = db.loc[db["名前"] == self.name]
 
         # NaNであるかを判定して文字列を返す
         def get_val(col_name, is_int=True):
@@ -40,6 +53,8 @@ class MemberSelectionBody(Body):
 
         # コンテンツ中身
         self.content = Column(
+            scroll=ScrollMode.AUTO,
+            expand=True,
             spacing=5,
             controls=[
                 Text(get_val("名前", is_int=False), size=32),
@@ -75,12 +90,44 @@ class MemberSelectionBody(Body):
                     ),
                 ),
                 Container(height=10),
-                Column(
+                Text("▼ 交通費申請 一覧 ▼", size=16),
+                Row(
+                    height=300,
+                    vertical_alignment=CrossAxisAlignment.STRETCH,
                     controls=[
-                        Text("▼ 申請書一覧 ▼", size=16),
-                        
-                    ],
-                    scroll=ScrollMode.AUTO
-                )
+                        Container(
+                            bgcolor=Colors.GREEN_50,
+                            padding=5,
+                            expand=True,
+                            content = Column(
+                                scroll=ScrollMode.AUTO,
+                                spacing=5,
+                                controls=[
+                                    *self.transport_expense_summary_list,
+                                ],
+                            )
+                        ),
+                    ]
+                ),
+                Container(height=10),
+                Text("▼ 交通費以外の経費申請 一覧 ▼", size=16),
+                Row(
+                    height=300,
+                    vertical_alignment=CrossAxisAlignment.STRETCH,
+                    controls=[
+                        Container(
+                            bgcolor=Colors.GREEN_50,
+                            padding=5,
+                            expand=True,
+                            content = Column(
+                                scroll=ScrollMode.AUTO,
+                                spacing=5,
+                                controls=[
+                                    *self.item_expense_summary_list,
+                                ],
+                            )
+                        ),
+                    ]
+                ),
             ],
         )

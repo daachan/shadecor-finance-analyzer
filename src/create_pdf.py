@@ -10,15 +10,64 @@ from reportlab.lib.units import mm
 from reportlab.lib import colors
 
 from drivePresenter import GoogleDrivePresenter
+from member_selection_body import MemberSelectionBody
 
 class PDFGenerator():
-    def __init__(self, filename="no_arg_output"):
+    def __init__(self, name="no_arg_output", body_list: list[MemberSelectionBody] = []):
+        # Bodyの設定情報を取得
+        self.pick_body : MemberSelectionBody
+        for body in body_list:
+            if body.name == name:
+                self.pick_body = body
+                break
+        # 交通費
+        self.expense_summary_dict : dict[str, int] = {}
+        self.expense_total : int = 0 #ついでに合計も計算
+        for item in self.pick_body.transport_expense_summary_list:
+            if item.checkFrag:
+                fn = str(item.file_name)
+                parts = fn.split("_")
+                info = f"【交通費】申請日：{parts[1]}_{parts[2]}"
+                
+                self.expense_total += item.value
+
+                if info in self.expense_summary_dict:
+                    self.expense_summary_dict[info] += item.value
+                else:
+                    self.expense_summary_dict[info] = item.value
+        # 交通費以外の経費
+        for item in self.pick_body.item_expense_summary_list:
+            if item.checkFrag:
+                fn = str(item.file_name)
+                parts = fn.split("_")
+                info = f"【その他】申請日：{parts[1]}_{parts[2]}"
+
+                self.expense_total += item.value
+
+                if info in self.expense_summary_dict:
+                    self.expense_summary_dict[info] += item.value
+                else:
+                    self.expense_summary_dict[info] = item.value
+
+        # 明細データの正規化
+        self.ROW_NUM = 20 #現在の出力行数
+        def fix_dict_to_list(summary_dict: dict[str, int], num: int):
+            item_list = [[text, cost] for text, cost in summary_dict.items()]
+            padding_size = 20 - len(item_list)
+            output_list = (item_list + [["", ""]] * padding_size)[:20]
+            return output_list
+        
+        self.expense_summary = fix_dict_to_list(self.expense_summary_dict, 20)
+
+        # 日時
         now = datetime.now()
         self.date = now.strftime("%Y-%m-%d")
-
-        self.username = filename
-        self.filepath = "/Users/daiki/Desktop/shadecor-finance-analyzer/pdf_folder/" + filename + "_" + self.date + ".pdf"
         
+        # 保存時のファイルパス
+        self.username = name
+        self.filepath = "/Users/daiki/Desktop/shadecor-finance-analyzer/pdf_folder/" + name + "_" + self.date + ".pdf"
+        
+        # 勤怠情報の読み込み
         self.systemLogic = GoogleDrivePresenter()
         db = self.systemLogic.getDataset()
         user_data = db[db["名前"] == self.username]
@@ -37,8 +86,6 @@ class PDFGenerator():
             else:
                 return str(val)
 
-        print(user_data)
-        
         self.student_id = get_val("学籍番号", is_int=True)
         self.role = get_val("職位", is_int=False)
         self.attend_num = get_val("出席（オンライン含む）", is_int=True)
@@ -131,7 +178,7 @@ class PDFGenerator():
 
         # 支給明細
         payment_data = [["摘要", "金額", "摘要", "金額", "摘要", "金額"]]
-        rows = [["こんにちは", i + 10000, "(電車)武庫川女子大前-中山寺_2025-11-12", i, "こんにちは", i] for i in range(0, 20)]
+        rows = [["こんにちは", i + 10000, self.expense_summary[i][0], self.expense_summary[i][1], "こんにちは", i] for i in range(0, 20)]
         payment_data.extend(rows) # または payment_data += rows
         payment_table = Table(
             payment_data, 

@@ -31,8 +31,11 @@ class MyLayout(Row):
 
         #GoogleDrivePresenter
         systemLogic = GoogleDrivePresenter()
-        path_list, name_list = systemLogic.getXlsx("山田太郎", "2025-3-12", "2025-12-28")
+        path_list = systemLogic.getXlsx("山田太郎", "2025-3-12", "2025-12-28")
         systemLogic.getExpenseData(path_list)
+
+        #呼び出すbodyインスタンスの辞書を作成
+        self.member_body_instances = {}
 
         #コンテンツの最小サイズ設定
         page.window.min_width = systemLogic.SIDEBAR_MIN_WIDTH + systemLogic.BODY_MIN_WIDTH
@@ -42,7 +45,7 @@ class MyLayout(Row):
         self.sidebar_container = MemberSelectionSidebar(func=self.switchContentByName)
         self.body_container = ErrorPreviewBody("初期ページ")
 
-        page.appbar = MemberSelectionHeader(page, self.sidebar_container)
+        page.appbar = MemberSelectionHeader(page, self.sidebar_container, self.member_body_instances)
         self.controls = [
             self.sidebar_container,
             self.body_container
@@ -60,7 +63,14 @@ class MyLayout(Row):
     
     #名前に応じたコンテンツを生成(member_selection:bodyの切り替え)
     def switchContentByName(self, pick_name: str):
-        self.body_container = MemberSelectionBody(pick_name)
+        if pick_name not in self.member_body_instances:
+            print(f"新規作成: {pick_name}")
+            self.member_body_instances[pick_name] = MemberSelectionBody(pick_name)
+        else:
+            print(f"既存のインスタンスを再利用: {pick_name}")
+
+        self.body_container = self.member_body_instances[pick_name]
+
         self.controls = [
             self.sidebar_container,
             self.body_container
