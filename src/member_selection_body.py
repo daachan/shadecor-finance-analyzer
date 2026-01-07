@@ -1,5 +1,6 @@
 import pandas as pd
 from expense_summary_card import ExpenseSummaryCard
+from reward_box import RewardBox
 from body import Body
 from flet import (
     Column,
@@ -129,5 +130,8 @@ class MemberSelectionBody(Body):
                         ),
                     ]
                 ),
+                Container(height=10),
+                Text("▼ 報酬金記入欄 ▼", size=16),
+                RewardBox(),
             ],
         )
