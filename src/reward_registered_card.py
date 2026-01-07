@@ -12,7 +12,8 @@ from flet import (
     IconButton,
     Icons,
     TextField,
-    InputFilter
+    InputFilter,
+    Event
 )
 
 class RewardRegisteredCard(Container):
@@ -27,18 +28,44 @@ class RewardRegisteredCard(Container):
         self.bgcolor = Colors.WHITE
         self.border_radius = 10
 
-        def validate_number_input(e):
-            # 入力欄が空、あるいは何も入力されていない場合に "0" を入れる
+        # 入力値を保持しておく
+        self.abstract : str = ""
+        self.amount : int = 0
+
+        def update_abstract(e:Event[TextField]):
+            self.abstract = e.control.value
+
+        def update_amount(e:Event[TextField]):
+            # e.control.value が空文字 "" の場合は 0 を代入するようにガードをかける
+            val = e.control.value
+            if val == "" or val is None:
+                self.amount = 0
+            else:
+                self.amount = int(val)
+
+        # 入力欄が空、あるいは何も入力されていない場合に "0" を入れる
+        def validate_number_input(e:Event[TextField]):
             if not e.control.value or e.control.value.strip() == "":
                 e.control.value = "0"
+                self.amount = 0
+                e.control.update()
+        
+         # 入力欄が空、あるいは何も入力されていない場合に "" を入れる
+        def validate_text_input(e:Event[TextField]):
+            if not e.control.value or e.control.value.strip() == "":
+                e.control.value = "未記入"
+                self.abstract = "未記入"
                 e.control.update()
 
         self.abstract_tb = TextField(
             label="摘要記入欄",
             hint_text="入力：5~10文字程度",
+            value="未記入",
             multiline=False,
             max_lines=1,
             expand=3,
+            on_blur=validate_text_input,
+            on_change=lambda e:update_abstract(e)
         )
         
         self.amount_tb = TextField(
@@ -49,8 +76,9 @@ class RewardRegisteredCard(Container):
             keyboard_type=KeyboardType.NUMBER,
             text_align=TextAlign.RIGHT,
             input_filter=InputFilter(allow=True, regex_string=r"^[0-9]*$"),
-            on_blur=validate_number_input,
             expand=2,
+            on_blur=validate_number_input,
+            on_change=lambda e:update_amount(e)
         )
 
         self.content = Row(

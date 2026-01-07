@@ -22,14 +22,16 @@ class PDFGenerator():
                 break
         # 交通費
         self.expense_summary_dict : dict[str, int] = {}
-        self.expense_total : int = 0 #ついでに合計も計算
+        self.amount_total : int = 0 #ついでに合計も計算
+        self.reward_summary_dict : dict[str, int] = {}
+        self.deduction_summary_dict : dict[str, int] = {}
         for item in self.pick_body.transport_expense_summary_list:
             if item.checkFrag:
                 fn = str(item.file_name)
                 parts = fn.split("_")
                 info = f"【交通費】申請日：{parts[1]}_{parts[2]}"
                 
-                self.expense_total += item.value
+                self.amount_total += item.value
 
                 if info in self.expense_summary_dict:
                     self.expense_summary_dict[info] += item.value
@@ -42,22 +44,40 @@ class PDFGenerator():
                 parts = fn.split("_")
                 info = f"【その他】申請日：{parts[1]}_{parts[2]}"
 
-                self.expense_total += item.value
+                self.amount_total += item.value
 
                 if info in self.expense_summary_dict:
                     self.expense_summary_dict[info] += item.value
                 else:
                     self.expense_summary_dict[info] = item.value
+        # 報酬金の記録
+        for item in self.pick_body.reward_box.reward_register_list:
+            info = item.abstract
+            self.amount_total += item.amount
+            if info in self.reward_summary_dict:
+                self.reward_summary_dict[info] += item.amount
+            else:
+                self.reward_summary_dict[info] = item.amount
+        # 天引き額の記録
+        for item in self.pick_body.deduction_box.reward_register_list:
+            info = item.abstract
+            self.amount_total -= item.amount
+            if info in self.deduction_summary_dict:
+                self.deduction_summary_dict[info] += item.amount
+            else:
+                self.deduction_summary_dict[info] = item.amount
 
         # 明細データの正規化
         self.ROW_NUM = 20 #現在の出力行数
         def fix_dict_to_list(summary_dict: dict[str, int], num: int):
             item_list = [[text, cost] for text, cost in summary_dict.items()]
-            padding_size = 20 - len(item_list)
-            output_list = (item_list + [["", ""]] * padding_size)[:20]
+            padding_size = num - len(item_list)
+            output_list = (item_list + [["", ""]] * padding_size)[:num]
             return output_list
         
-        self.expense_summary = fix_dict_to_list(self.expense_summary_dict, 20)
+        self.expense_summary = fix_dict_to_list(self.expense_summary_dict, self.ROW_NUM)
+        self.reward_summary = fix_dict_to_list(self.reward_summary_dict, self.ROW_NUM)
+        self.deduction_summary = fix_dict_to_list(self.deduction_summary_dict, self.ROW_NUM)
 
         # 日時
         now = datetime.now()
@@ -178,7 +198,17 @@ class PDFGenerator():
 
         # 支給明細
         payment_data = [["摘要", "金額", "摘要", "金額", "摘要", "金額"]]
-        rows = [["こんにちは", i + 10000, self.expense_summary[i][0], self.expense_summary[i][1], "こんにちは", i] for i in range(0, 20)]
+        rows = [
+            [
+                self.reward_summary[i][0], 
+                f"{self.reward_summary[i][1]:,}円" if isinstance(self.reward_summary[i][1], int) else self.reward_summary[i][1], 
+                self.expense_summary[i][0], 
+                f"{self.expense_summary[i][1]:,}円" if isinstance(self.expense_summary[i][1], int) else self.expense_summary[i][1], 
+                self.deduction_summary[i][0], 
+                f"{self.deduction_summary[i][1]:,}円" if isinstance(self.deduction_summary[i][1], int) else self.deduction_summary[i][1] 
+            ] 
+            for i in range(0, 20)
+        ]
         payment_data.extend(rows) # または payment_data += rows
         payment_table = Table(
             payment_data, 
@@ -196,7 +226,9 @@ class PDFGenerator():
             ("FONT", (0, 0), (-1, -1), font_bold, 5),
             ("BOX", (0, 0), (-1, -1), 1, colors.black),
             ("INNERGRID", (0, 0), (-1, -1), 1, colors.black),
-            # ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+            ("ALIGN", (3, 0), (3, -1), "RIGHT"),
+            ("ALIGN", (5, 0), (5, -1), "RIGHT"),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ]))
         payment_table.wrapOn(pdf_canvas, 15 * mm, 40 * mm)
@@ -204,7 +236,7 @@ class PDFGenerator():
 
         # 合計金額
         total_data = [
-            ["合計", "XX,XXX" + " 円"]
+            ["合計", f"{self.amount_total:,}円" if isinstance(self.amount_total, int) else self.amount_total]
         ]
         total_table = Table(total_data, colWidths=((A4_WIDTH - 30 * mm)/4), rowHeights=(7 * mm))
         total_table.setStyle(TableStyle([

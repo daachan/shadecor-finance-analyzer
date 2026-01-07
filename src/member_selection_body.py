@@ -34,6 +34,12 @@ class MemberSelectionBody(Body):
         for item in item_expense_list:
             self.item_expense_summary_list.append(ExpenseSummaryCard(item[0], item[1], item[2]))
 
+        # 報酬金記入欄
+        self.reward_box = RewardBox()
+
+        # 天引き額記入欄
+        self.deduction_box = RewardBox()
+
         # マスタDBから勤怠実績などのリストを取得
         db = self.systemLogic.getDataset()
         member_row = db.loc[db["名前"] == self.name]
@@ -131,7 +137,10 @@ class MemberSelectionBody(Body):
                     ]
                 ),
                 Container(height=10),
-                Text("▼ 報酬金記入欄 ▼", size=16),
-                RewardBox(),
+                Text("▼ 報酬金 記入欄 ▼", size=16),
+                self.reward_box,
+                Container(height=10),
+                Text("▼ 天引き額 記入欄 ▼", size=16),
+                self.deduction_box,
             ],
         )

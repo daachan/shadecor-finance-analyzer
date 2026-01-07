@@ -35,7 +35,7 @@ class RewardBox(Box):
                         spacing=5,
                         controls=[
                             *self.reward_register_list,
-                            IconButton(icon=Icons.ADD, on_click=add_reward_card, expand=True)
+                            IconButton(icon=Icons.ADD, on_click=add_reward_card, bgcolor=Colors.WHITE, expand=True)
                         ],
                     )
                 ),
@@ -58,7 +58,7 @@ class RewardBox(Box):
                         spacing=5,
                         controls=[
                             *self.reward_register_list,
-                            IconButton(icon=Icons.ADD, on_click=add_reward_card, expand=True)
+                            IconButton(icon=Icons.ADD, on_click=add_reward_card, bgcolor=Colors.WHITE, expand=True)
                         ],
                     )
                 ),
