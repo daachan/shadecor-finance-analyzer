@@ -8,7 +8,6 @@ from flet import (
     ScrollMode,
     IconButton,
     Icons,
-    CrossAxisAlignment
 )
 
 class RewardBox(Box):

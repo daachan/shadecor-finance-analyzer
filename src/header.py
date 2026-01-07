@@ -5,7 +5,6 @@ from flet import (
     MainAxisAlignment,
     CrossAxisAlignment,
     Colors,
-    Page,
 )
 
 class Header(AppBar):

@@ -1,11 +1,9 @@
 from sidebar import Sidebar
 from flet import (
-    MouseCursor,
     Text,
     Column,
     ScrollMode,
     Divider,
-    Control
 )
 
 from name_button import NameButton

@@ -1,12 +1,9 @@
 #必要ライブラリ読み込み
-import sys
 from flet import (
     Page,
     Row,
     MainAxisAlignment,
     CrossAxisAlignment,
-    Container,
-    Colors
 )
 
 #コンテンツ読み込み
@@ -24,6 +21,7 @@ from drivePresenter import GoogleDrivePresenter
 class MyLayout(Row):
     def __init__(self, page: Page):
         super().__init__()
+        self.main_page = page
         self.alignment=MainAxisAlignment.START
         self.vertical_alignment=CrossAxisAlignment.STRETCH
         self.expand = True
@@ -43,31 +41,25 @@ class MyLayout(Row):
 
         #基本レイアウト作成
         self.sidebar_container = MemberSelectionSidebar(func=self.switchContentByName)
-        self.body_container = ErrorPreviewBody("初期ページ")
-
+        self.body_container = ErrorPreviewBody("")
         page.appbar = MemberSelectionHeader(page, self.sidebar_container, self.member_body_instances)
+
+        #初期状態の確認
+        if not systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH):
+            self.occurError("ERROR:dataset.csvが見つかりません")
+
+        if systemLogic.hasErrorFiles(systemLogic.ERROR_FOLDER_PATH):
+            self.occurError("ERROR:退避用フォルダの中身を移行/削除してください")
+        
         self.controls = [
             self.sidebar_container,
             self.body_container
         ]
-
-        if not systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH):
-            page.appbar = ErrorPreviewHeader(page)
-            print("dataset.csvが見つかりません")
-
-        #初期状態の確認
-        if (systemLogic.isDatasetExists(systemLogic.SCRIPT_FOLDER_PATH)) and (not systemLogic.hasErrorFiles(systemLogic.ERROR_FOLDER_PATH)):
-            print("view2に移行したよん")
-        else:
-            print("view1に移行したよん")
     
     #名前に応じたコンテンツを生成(member_selection:bodyの切り替え)
     def switchContentByName(self, pick_name: str):
-        if pick_name not in self.member_body_instances:
-            print(f"新規作成: {pick_name}")
+        if pick_name not in self.member_body_instances: #既存のインスタンスが存在しなければ新規作成
             self.member_body_instances[pick_name] = MemberSelectionBody(pick_name)
-        else:
-            print(f"既存のインスタンスを再利用: {pick_name}")
 
         self.body_container = self.member_body_instances[pick_name]
 
@@ -77,8 +69,8 @@ class MyLayout(Row):
         ]
         self.update()
 
-    def occurError(self, main_page: Page, message: str):
-            main_page.appbar = ErrorPreviewHeader(main_page)
+    def occurError(self, message: str):
+            self.main_page.appbar = ErrorPreviewHeader(self.main_page)
             self.body_container = ErrorPreviewBody(message)
             self.sidebar_container = ErrorPreviewSidebar()
 

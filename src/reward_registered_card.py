@@ -1,8 +1,6 @@
 from flet import (
     Container,
     Row,
-    Text,
-    TextOverflow,
     TextAlign,
     KeyboardType,
     Colors,
